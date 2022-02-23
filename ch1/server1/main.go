@@ -10,6 +10,7 @@ import (
 	"math"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"sync"
 )
 
@@ -43,7 +44,18 @@ func main() {
 		if err := r.ParseForm(); err != nil {
 			log.Print(err)
 		}
-		lissajous(rw, NewLisParams())
+		params := NewLisParams()
+		if val, ok := r.Form["cycles"]; ok {
+			for _, v := range val {
+				valParsed, err := strconv.Atoi(v)
+				if err != nil || valParsed == 0 {
+					log.Println("Unabled to parse cycles param")
+				} else {
+					params.cycles = float64(valParsed)
+				}
+			}
+		}
+		lissajous(rw, params)
 
 	})
 	log.Fatal(http.ListenAndServe("localhost:8080", nil))
