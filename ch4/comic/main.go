@@ -22,9 +22,10 @@ func main() {
 
 		result, method, err := xkcd.GetComic(input, cache)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
+		} else {
+			fmt.Printf("%s\n%s\n", method, result.Transcript)
 		}
-		fmt.Printf("%s\n%s\n", method, result.Transcript)
 	}
 
 }

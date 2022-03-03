@@ -14,7 +14,7 @@ func Test_makeURL(t *testing.T) {
 		args args
 		want string
 	}{
-		{name: "basic test case",
+		{name: "url string sub works",
 			args: args{id: "44"},
 			want: "https://xkcd.com/44/info.0.json"},
 	}
@@ -82,13 +82,13 @@ func Test_getComicFromRemote(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "sanity check",
+			name:    "from remote id:781",
 			args:    args{id: "781"},
 			want:    781,
 			wantErr: false,
 		},
 		{
-			name:    "sanity check 2",
+			name:    "from remote id:500",
 			args:    args{id: "500"},
 			want:    500,
 			wantErr: false,
