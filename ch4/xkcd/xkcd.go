@@ -20,33 +20,23 @@ type XKCDSummary struct {
 	Day        string `json:"day"`
 }
 
-type Cache struct {
-	Values map[string]*XKCDSummary
-}
-
-func NewCache() *Cache {
-	return &Cache{Values: make(map[string]*XKCDSummary)}
-}
-
-func (c *Cache) SetCache(id string, result *XKCDSummary) {
-	c.Values[id] = result
-}
-
-func (c *Cache) GetFromCache(id string) (*XKCDSummary, bool) {
-	val, ok := c.Values[id]
-	return val, ok
+func GetComic(id string, c *Cache) (*XKCDSummary, string, error) {
+	if result, ok := c.GetFromCache(id); ok {
+		return result, "cache", nil
+	}
+	remoteResult, err := getComicFromRemote(id)
+	if err != nil {
+		return nil, "error", err
+	}
+	c.SetCache(id, remoteResult)
+	return remoteResult, "remote", err
 }
 
 func makeURL(id string) string {
 	return fmt.Sprintf("https://xkcd.com/%s/info.0.json", id)
-
 }
 
-// func GetComic(id string)(*XKCDSummary, error) {
-// 	if result, ok := Ge
-// }
-
-func GetComicFromRemote(id string) (*XKCDSummary, error) {
+func getComicFromRemote(id string) (*XKCDSummary, error) {
 	url := makeURL(id)
 	resp, err := http.Get(url)
 	if err != nil {
