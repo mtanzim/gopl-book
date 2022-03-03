@@ -1,4 +1,4 @@
-#gopl-book
+# gopl-book
 
 [Book](http://www.gopl.io/)
 
