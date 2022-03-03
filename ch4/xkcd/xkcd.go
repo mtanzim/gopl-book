@@ -42,6 +42,10 @@ func makeURL(id string) string {
 
 }
 
+// func GetComic(id string)(*XKCDSummary, error) {
+// 	if result, ok := Ge
+// }
+
 func GetComicFromRemote(id string) (*XKCDSummary, error) {
 	url := makeURL(id)
 	resp, err := http.Get(url)
