@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 type dollar float64
@@ -45,10 +46,33 @@ func (db database) delete(w http.ResponseWriter, req *http.Request) {
 
 }
 
+func (db database) update(w http.ResponseWriter, req *http.Request) {
+	item := req.URL.Query().Get("item")
+	newPrice := req.URL.Query().Get("price")
+
+	_, ok := db[item]
+
+	if !ok {
+		http.Error(w, "not found", http.StatusNotFound)
+		return
+	}
+
+	if priceFloat, err := strconv.ParseFloat(newPrice, 64); err == nil {
+		db[item] = dollar(priceFloat)
+		fmt.Fprintf(w, "Updated %s: %s\n", item, db[item])
+		return
+	} else {
+		log.Println(err)
+		http.Error(w, "Failed to update", http.StatusInternalServerError)
+	}
+
+}
+
 func main() {
 	db := database{"shoes": 55, "tuxedo": 567}
 	http.HandleFunc("/list", db.list)
 	http.HandleFunc("/price", db.readPrice)
 	http.HandleFunc("/delete", db.delete)
+	http.HandleFunc("/update", db.update)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
