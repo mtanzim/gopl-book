@@ -39,7 +39,7 @@ go f() // create a goroutine to call f(), DO NOT wait
 ```
 
 - Examples
-  - [spinner](ch8/spinner/main.go) for a more elaborate example
-  - [clock](ch8/clock2/main.go) for a more elaborate example
-  - [echo server](ch8/reverb2/main.go) for a more elaborate example
+  - [spinner](ch8/spinner/main.go) 
+  - [clock](ch8/clock2/main.go)
+  - [echo server](ch8/reverb2/main.go)
 
