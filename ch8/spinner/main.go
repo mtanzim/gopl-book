@@ -6,6 +6,7 @@ import (
 )
 
 func main() {
+	// `go` here allows the subsequent LOC to execute while the spinner is still operating
 	go spinner(100 * time.Millisecond)
 	const n = 45
 	fmt.Printf("Calculating Fibonnaci(%d)\n", n)
