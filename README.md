@@ -76,6 +76,13 @@ ch = make(chan int, 3) // buffered channel with capacity of 3
 
 ##### Unbuffered Channels
 
+- Unbuffered channels are a synchronization mechanism, and are often called _synchronous_ channels
+- A send operation on an unbuffered channel blocks the sending goroutine until the message has been received by another goroutine
+- Similarly, if a receive is attempted first, the receiving goroutine blocks until a message is sent on the channel by another goroutine
+- Note [spinner2](ch8/spinner2/main.go) for an example of a simple unbuffered channel
+- Channels can often carry no value, and simply be used for synchronization, in these cases, we call messages `events`
+- `events` are conventionally denoted with the element type of `struct {}`, however, `bool` and `int` are also common
+- Note [spinner3](ch8/spinner3/main.go) for an example of a simple unbuffered channel with events
 
 
 

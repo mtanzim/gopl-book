@@ -21,11 +21,4 @@ func fib(x int) int {
 	return fib(x-1) + fib(x-2)
 }
 
-func spinner(delay time.Duration) {
-	for {
-		for _, r := range `-\|/` {
-			fmt.Printf("\r%c", r)
-			time.Sleep(delay)
-		}
-	}
-}
+
