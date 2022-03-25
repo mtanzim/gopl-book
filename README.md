@@ -43,3 +43,41 @@ go f() // create a goroutine to call f(), DO NOT wait
   - [clock](ch8/clock2/main.go)
   - [echo server](ch8/reverb2/main.go)
 
+#### Channels
+
+- Goroutines are the activities of concurrent programs, and `channels` are the connections between them
+- It is a communication mechanism through which one goroutine can can send values to another goroutine
+- Channels carry value of an _element type_
+- The built in `make` function can create channels
+
+```go
+ch := make (chan int)
+```
+
+- Channels are reference types similar to maps and slices. Therefore, copying channels, passing them as arguments copies a _reference_ referring to the same data structure
+- The zero value of channels is `nil`
+- Channels allow two operations, _send_ and _receive_, collectively known as _communications_; both use the `<-` operator
+
+```go
+ch <- x // a send statement
+x = <- ch // a receive statement
+<- ch // receive, discard result
+```
+- Channels also support a `close` operation
+- Closed channels indicate that no more values will be sent; subsequent attempts at send will panic
+- Closed channels can be received from until drained, and all values after will be the zero value of the channel _element type_
+- Channels can be _buffered_ or _unbuffered_, _unbuffered_ channels have non-zero _capacity_; details will be explained in the following section
+
+```go
+ch = make(chan int) // unbuffered channel
+ch = make(chan int) // unbuffered channel
+ch = make(chan int, 3) // buffered channel with capacity of 3
+```
+
+##### Unbuffered Channels
+
+
+
+
+
+
