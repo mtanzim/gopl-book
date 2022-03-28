@@ -117,3 +117,16 @@ close(squares)
 ```
 
 - See the complete example in [pipeline2](ch8/pipeline2/main.go)
+- Note that the garbage collector will clean up unreachable channels, and therefore it is only important to close them if we wish to communicate that receiving goroutines will no longer need to wait for a value on the channel
+- Additionally, channels can be marked as unidirectional, ie:
+
+```go
+func counter(out chan<- int){
+  for x:=0; x < 100; x++ {
+    out <-x
+  }
+  close(out)
+}
+```
+- Note the full example in [pipeline3](ch8/pipeline3/main.go), particularly the automatic type conversion from bidirectional to unidirectional channels
+- The reverse conversion is not permitted or valid
