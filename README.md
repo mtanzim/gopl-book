@@ -90,7 +90,7 @@ ch = make(chan int, 3) // buffered channel with capacity of 3
 - Channels can be used to create a pipeline between asynchronous processes
 - See the following [pipeline example](ch8/pipeline1/main.go), also demonstrated below in the diagram
 
-![Pipeline](./assets/pipeline.png)
+![Pipeline](assets/pipeline.png)
 
 - Channels can be closed if it it is important for the sender communicate that no more values will be produced
 - Sending on a closed channel causes a panic
@@ -128,5 +128,36 @@ func counter(out chan<- int){
   close(out)
 }
 ```
+
 - Note the full example in [pipeline3](ch8/pipeline3/main.go), particularly the automatic type conversion from bidirectional to unidirectional channels
 - The reverse conversion is not permitted or valid
+
+##### Buffered Channels
+
+- Buffered channels hold a _queue_ of values (FIFO), sending adds a value to the back, receiving removes a value from the front
+- See the following diagram for the blocking mechanism on send/receive
+
+![Buffered channels](assets/buffered_channels.png)
+
+- A buffered channel can be instantiated with
+
+```go
+ch = make (chan string, 3)
+```
+
+- `len` can be used to query the buffer capacity
+- Buffered channels are used to communicate between different goroutines, do not use them as a simple queue as there is a risk of deadlock
+- The following is an example of buffered channel usage
+
+```go
+func query() {
+  responses := make(chan string, 3)
+  go func() {responses <- request("https://httpbin.org/image/jpeg")}()
+  go func() {responses <- request("https://httpbin.org/image/svg")}()
+  go func() {responses <- request("https://httpbin.org/image/png")}()
+  return <- responses
+}
+```
+
+- Note that the usage of on unbuffered channel will cause the two slower goroutines to have no one to receive their message; this is known as a _goroutine leak_
+- The full example can be found [here](ch8/bufChannel/main.go)
