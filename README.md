@@ -20,8 +20,8 @@
 ### Goroutines and Channels
 
 - Go allows for two styles of concurrent programming
-  1. __Communicating sequential processes (CSP)__: passing values between independent activities (goroutines)
-  1. __Shared memory multithreading__ (threads in most mainstream languages)
+  1. **Communicating sequential processes (CSP)**: passing values between independent activities (goroutines)
+  1. **Shared memory multithreading** (threads in most mainstream languages)
 
 #### Goroutines
 
@@ -39,7 +39,7 @@ go f() // create a goroutine to call f(), DO NOT wait
 ```
 
 - Examples
-  - [spinner](ch8/spinner/main.go) 
+  - [spinner](ch8/spinner/main.go)
   - [clock](ch8/clock2/main.go)
   - [echo server](ch8/reverb2/main.go)
 
@@ -63,6 +63,7 @@ ch <- x // a send statement
 x = <- ch // a receive statement
 <- ch // receive, discard result
 ```
+
 - Channels also support a `close` operation
 - Closed channels indicate that no more values will be sent; subsequent attempts at send will panic
 - Closed channels can be received from until drained, and all values after will be the zero value of the channel _element type_
@@ -84,7 +85,35 @@ ch = make(chan int, 3) // buffered channel with capacity of 3
 - `events` are conventionally denoted with the element type of `struct {}`, however, `bool` and `int` are also common
 - Note [spinner3](ch8/spinner3/main.go) for an example of a simple unbuffered channel with events
 
+##### Pipelines
 
+- Channels can be used to create a pipeline between asynchronous processes
+- See the following [pipeline example](ch8/pipeline1/main.go), also demonstrated below in the diagram
 
+![Pipeline](./assets/pipeline.png)
 
+- Channels can be closed if it it is important for the sender communicate that no more values will be produced
+- Sending on a closed channel causes a panic
+- After the closed channel is drained, subsequent attempts at receiving will yield a zero valye of the element type
+- The receiving operation can check if a channel is closed, ie:
 
+```go
+for {
+  x, ok := <- naturals
+  squares <- x*x
+  if !ok {
+    break
+  }
+}
+```
+
+- A more convenient syntax is as follows:
+
+```go
+for x:= range naturals {
+  squares <- x*x
+}
+close(squares)
+```
+
+- See the complete example in [pipeline2](ch8/pipeline2/main.go)
