@@ -161,3 +161,9 @@ func query() {
 
 - Note that the usage of on unbuffered channel will cause the two slower goroutines to have no one to receive their message; this is known as a _goroutine leak_
 - The full example can be found [here](ch8/bufChannel/main.go)
+- Note that the choice of buffered vs unbuffered, as well as the capacity of the buffered channel affects both performance and correctness of the program; watch for goroutine leaks that may add up over time to cause hangs and slowdowns
+- Goroutine leaks are not automatically collected
+
+##### Parallel Workers
+
+- A very common pattern is to run workers in parallel
