@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 
 	"github.com/mtanzim/gopl-book/ch8/thumbnail/thumbnail"
 )
@@ -94,6 +95,29 @@ func makeThumbnails5(filenames []string) ([]string, error) {
 	return thumbfiles, nil
 }
 
+func makeThumbnails6(filenames <-chan string, sizes chan<- int64) {
+	var wg sync.WaitGroup
+
+	for f := range filenames {
+		wg.Add(1)
+		go func(f string) {
+			defer wg.Done()
+			thumb, err := thumbnail.ImageFile(f)
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			info, _ := os.Stat(thumb)
+			sizes <- info.Size()
+		}(f)
+	}
+	// closer
+	go func() {
+		wg.Wait()
+		close(sizes)
+	}()
+}
+
 func getImagePaths() []string {
 	path, err := os.Getwd()
 	if err != nil {
@@ -112,5 +136,26 @@ func main() {
 	paths := getImagePaths()
 	// makeThumbnails2(paths)
 	// makeThumbnails3(paths)
-	makeThumbnails4(paths)
+	// makeThumbnails4(paths)
+	// makeThumbnails5(paths)
+
+	// for makeThumbnails6
+	ch := make(chan string, len(paths))
+	sizes := make(chan int64, len(paths))
+
+	go makeThumbnails6(ch, sizes)
+	for _, path := range paths {
+		fmt.Println(path)
+		ch <- path
+	}
+	close(ch)
+
+	var total int64
+	// sizes channel forces the main channel to wait
+	for size := range sizes {
+		total += size
+	}
+
+	fmt.Printf("Done, bytes written: %d\n", total)
+
 }
