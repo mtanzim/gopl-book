@@ -6,7 +6,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/mtanzim/gopl-book/ch8/thumbnail/thumbnail"
+	"gopl.io/ch8/thumbnail"
 )
 
 // make thumbnails serially
