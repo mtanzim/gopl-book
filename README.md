@@ -167,7 +167,7 @@ func query() {
 ##### Parallel Workers
 
 - A very common pattern is to run workers in parallel
-- Examples of this can be see [here](ch8/thumbnail/main.go)
+- Examples of this can be seen in the [thumbnail generator example](ch8/thumbnail/main.go)
 - Note particularly the `makeThumbnails6` function, for which we perform the following steps:
   1. Make channels for input and output
   1. Fire off a function concurrently, passing the communication channels
