@@ -18,7 +18,7 @@ func crawl(url string) []string {
 
 // To avoid spawning a potentially infinite number of goroutines
 // resulting in errors such as: 429 Too Many Requests
-// The following example shows one can limit the number of concurrent processes
+// The following example shows how one can limit the number of concurrent processes
 type linkContainer struct {
 	link  string
 	depth int
@@ -36,7 +36,7 @@ func main() {
 		workList <- lst
 	}()
 
-	// create 20 worker goroutines
+	// create 20 worker goroutines, limit concurrency
 	for i := 0; i < 20; i++ {
 		go func() {
 			for link := range unseenLinks {
