@@ -203,3 +203,11 @@ select {
 - If multiple cases are ready, `select` picks at random
 - To avoid blocking behaviour if desired, ensure usage of `default`
 - See the [countdown](ch8/countdown1/main.go) for example usage of `select`
+
+##### Cancellations
+
+- There is no way for one goroutine to stop another, doing so would leave shared variables in an undefined state
+- In the [countdown](ch8/countdown1/main.go), we sent a single value over a channel, but note that a message over a channel can only be consumed once. Thus, how do we signal multiple goroutines to stop?
+- One solution may be to send multiple cancel messages, but it is difficult to know how many goroutines may be operating at a time
+- Note that once a channel is closed and drained, all subsequent receive operations yield a zero value
+- We can exploit this behaviour for a _broadcast_ message
