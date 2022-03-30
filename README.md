@@ -169,8 +169,12 @@ func query() {
 - A very common pattern is to run workers in parallel
 - Examples of this can be see [here](ch8/thumbnail/main.go)
 - Note particularly the `makeThumbnails6` function, for which we perform the following steps:
-  1. make channels for input and output
+  1. Make channels for input and output
   1. Fire off a function concurrently, passing the communication channels
   1. Produce on the input channel from the `main` function
   1. Listen on the input channel inside `makeThumbnails6`, perform all required tasks, and signal closure on the output channel with the help of `sync.WaitGroup`. This is a special counter that safely increments and decrements as goroutines start up and close off.
   1. Iterate over the output channel inside the `main` function and summarize the results, which is summing the number of bytes written in this case
+- Also note the [concurrent web crawler example](ch8/crawl/main.go). Highlighting the key concepts used:
+  - Crawler goroutines are fed through the `unseenLinks` channel
+  - The seen map is _confined_ to the `main` goroutine, this ensures correctness and prevent unnecessary information sharing
+  - Links found by crawl are sent to the worklist from yet another goroutine to avoid deadlocks
