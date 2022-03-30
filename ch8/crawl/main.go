@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -18,27 +19,47 @@ func crawl(url string) []string {
 // To avoid spawning a potentially infinite number of goroutines
 // resulting in errors such as: 429 Too Many Requests
 // The following example shows one can limit the number of concurrent processes
-func main() {
-	workList := make(chan []string)
-	unseenLinks := make(chan string) // deduped urls
+type linkContainer struct {
+	link  string
+	depth int
+}
 
-	go func() { workList <- os.Args[1:] }()
+func main() {
+	workList := make(chan []*linkContainer)
+	unseenLinks := make(chan *linkContainer) // deduped urls
+
+	go func() {
+		lst := []*linkContainer{}
+		for _, l := range os.Args[1:] {
+			lst = append(lst, &linkContainer{l, 0})
+		}
+		workList <- lst
+	}()
 
 	// create 20 worker goroutines
 	for i := 0; i < 20; i++ {
 		go func() {
 			for link := range unseenLinks {
-				foundLinks := crawl(link)
-				go func() { workList <- foundLinks }()
+				foundLinks := crawl(link.link)
+				lst := []*linkContainer{}
+				for _, l := range foundLinks {
+					lst = append(lst, &linkContainer{l, link.depth + 1})
+				}
+				go func() { workList <- lst }()
 			}
 		}()
 	}
 
 	seen := make(map[string]bool)
+
 	for list := range workList {
 		for _, link := range list {
-			if !seen[link] {
-				seen[link] = true
+			if !seen[link.link] {
+				if link.depth > 1 {
+					fmt.Printf("%s exceeds depth requirements as it is of depth %d\n", link.link, link.depth)
+					continue
+				}
+				seen[link.link] = true
 				unseenLinks <- link
 			}
 		}
