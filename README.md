@@ -178,3 +178,28 @@ func query() {
   - Crawler goroutines are fed through the `unseenLinks` channel
   - The seen map is _confined_ to the `main` goroutine, this ensures correctness and prevent unnecessary information sharing
   - Links found by crawl are sent to the worklist from yet another goroutine to avoid deadlocks
+
+##### Multiplexing with `select`
+
+- We can listen from several channels and multiplex based on their responses using a `select` statement
+- `select` statements are like switch statements, where it has a number of a cases, and a `default`
+- Each case can specify a _communication_ and its associated actions with a block of statements
+
+```go
+select {
+  case <-ch1:
+    // ...
+  case x: <-ch2:
+    // do something with x
+  case ch3 <- y:
+    // ...
+  default:
+    // ..
+  }
+```
+
+- `select` waits until _communication_ on some channel is ready
+- An empty select, ie: `select{}` waits forever
+- If multiple cases are ready, `select` picks at random
+- To avoid blocking behaviour if desired, ensure usage of `default`
+- See the [countdown](ch8/countdown1/main.go) for example usage of `select`
