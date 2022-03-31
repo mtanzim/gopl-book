@@ -211,3 +211,4 @@ select {
 - One solution may be to send multiple cancel messages, but it is difficult to know how many goroutines may be operating at a time
 - Note that once a channel is closed and drained, all subsequent receive operations yield a zero value
 - We can exploit this behaviour for a _broadcast_ message
+- See [broadcast](ch8/broadcast/main.go) for an example
