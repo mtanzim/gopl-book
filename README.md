@@ -212,3 +212,5 @@ select {
 - Note that once a channel is closed and drained, all subsequent receive operations yield a zero value
 - We can exploit this behaviour for a _broadcast_ message
 - See [broadcast](ch8/broadcast/main.go) for an example
+
+##### [Chat Example](ch8/chat/main.go)
