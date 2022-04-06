@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"time"
 )
 
 // To use on Mac
@@ -74,17 +75,19 @@ func broadcaster() {
 func handleConn(conn net.Conn) {
 	ch := make(chan string)
 	go clientWriter(conn, ch)
-
+	// go clientTimer(conn, ch)
 	who := conn.RemoteAddr().String()
+	client := &clientWithName{ch, who}
+
 	ch <- "You are " + who
 	messages <- who + " has arrived"
-	entering <- &clientWithName{ch, who}
+	entering <- client
 
 	input := bufio.NewScanner(conn)
 	for input.Scan() {
 		messages <- who + ": " + input.Text()
 	}
-	leaving <- &clientWithName{ch, who}
+	leaving <- client
 	messages <- who + "has left"
 	conn.Close()
 
@@ -93,5 +96,24 @@ func handleConn(conn net.Conn) {
 func clientWriter(conn net.Conn, ch chan string) {
 	for msg := range ch {
 		fmt.Fprintln(conn, msg)
+	}
+}
+
+func clientTimer(conn net.Conn, ch chan string) {
+	timer := time.NewTimer(2 * time.Second)
+	who := conn.RemoteAddr().String()
+	for {
+		select {
+		case <-timer.C:
+			leaving <- &clientWithName{ch, who}
+			messages <- who + "has timed out"
+			conn.Close()
+			return
+		case <-ch:
+			timer.Stop()
+			timer = time.NewTimer(2 * time.Second)
+		default:
+			// do nothing
+		}
 	}
 }
