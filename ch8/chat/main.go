@@ -38,7 +38,6 @@ type clientWithName struct {
 var (
 	entering = make(chan *clientWithName)
 	leaving  = make(chan *clientWithName)
-	timedOut = make(chan *clientWithName)
 	messages = make(chan string)
 )
 
@@ -46,7 +45,7 @@ func broadcaster() {
 
 	clients := make(map[*clientWithName]bool)
 
-	broadcastNames := func(clients map[*clientWithName]bool) {
+	broadcastNames := func() {
 		clientNames := []string{}
 		for client := range clients {
 			clientNames = append(clientNames, client.who)
@@ -61,11 +60,17 @@ func broadcaster() {
 		select {
 		case msg := <-messages:
 			for client := range clients {
-				client.ch <- msg
+				select {
+				case client.ch <- msg:
+					// do nothing
+				case <-time.NewTimer(2 * time.Second).C:
+					// in case messages are dropped, do not block
+					fmt.Println("Message skipped for " + client.who)
+				}
 			}
 		case client := <-entering:
 			clients[client] = true
-			broadcastNames(clients)
+			broadcastNames()
 		case client := <-leaving:
 			delete(clients, client)
 			close(client.ch)
