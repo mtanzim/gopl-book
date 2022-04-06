@@ -29,25 +29,44 @@ func main() {
 
 type client chan<- string
 
+type clientWithName struct {
+	ch  client
+	who string
+}
+
 var (
-	entering = make(chan client)
-	leaving  = make(chan client)
+	entering = make(chan *clientWithName)
+	leaving  = make(chan *clientWithName)
 	messages = make(chan string)
 )
 
 func broadcaster() {
-	clients := make(map[client]bool)
+
+	clients := make(map[*clientWithName]bool)
+
+	broadcastNames := func(clients map[*clientWithName]bool) {
+		clientNames := []string{}
+		for client := range clients {
+			clientNames = append(clientNames, client.who)
+		}
+		for client := range clients {
+			msg := fmt.Sprintf("The following clients are present %v\n", clientNames)
+			client.ch <- msg
+		}
+	}
+
 	for {
 		select {
 		case msg := <-messages:
 			for client := range clients {
-				client <- msg
+				client.ch <- msg
 			}
 		case client := <-entering:
 			clients[client] = true
+			broadcastNames(clients)
 		case client := <-leaving:
 			delete(clients, client)
-			close(client)
+			close(client.ch)
 		}
 	}
 }
@@ -59,13 +78,13 @@ func handleConn(conn net.Conn) {
 	who := conn.RemoteAddr().String()
 	ch <- "You are " + who
 	messages <- who + " has arrived"
-	entering <- ch
+	entering <- &clientWithName{ch, who}
 
 	input := bufio.NewScanner(conn)
 	for input.Scan() {
 		messages <- who + ": " + input.Text()
 	}
-	leaving <- ch
+	leaving <- &clientWithName{ch, who}
 	messages <- who + "has left"
 	conn.Close()
 
