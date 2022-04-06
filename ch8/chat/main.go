@@ -75,9 +75,15 @@ func broadcaster() {
 
 func handleConn(conn net.Conn) {
 	ch := make(chan string)
+	who := ""
+	fmt.Fprintln(conn, "Please enter your name: ")
+	input := bufio.NewScanner(conn)
+	for input.Scan() {
+		who = input.Text()
+		break
+	}
 	go clientWriter(conn, ch)
-	who := conn.RemoteAddr().String()
-	timeoutVal := time.Duration(3)
+	timeoutVal := time.Duration(3600)
 	client := &clientWithName{ch, who}
 
 	reset := make(chan struct{})
@@ -100,7 +106,6 @@ func handleConn(conn net.Conn) {
 	messages <- who + " has arrived"
 	entering <- client
 
-	input := bufio.NewScanner(conn)
 	for input.Scan() {
 		messages <- who + ": " + input.Text()
 		reset <- struct{}{}
