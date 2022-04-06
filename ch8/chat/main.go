@@ -38,6 +38,7 @@ type clientWithName struct {
 var (
 	entering = make(chan *clientWithName)
 	leaving  = make(chan *clientWithName)
+	timedOut = make(chan *clientWithName)
 	messages = make(chan string)
 )
 
@@ -75,9 +76,25 @@ func broadcaster() {
 func handleConn(conn net.Conn) {
 	ch := make(chan string)
 	go clientWriter(conn, ch)
-	// go clientTimer(conn, ch)
 	who := conn.RemoteAddr().String()
+	timeoutVal := time.Duration(3)
 	client := &clientWithName{ch, who}
+
+	reset := make(chan struct{})
+	go func() {
+		for alive := true; alive; {
+			timer := time.NewTimer(timeoutVal * time.Second)
+			select {
+			case <-reset:
+				timer.Stop()
+			case <-timer.C:
+				alive = false
+				messages <- who + " has timed out"
+				fmt.Fprintln(conn, "You have timed out!")
+				conn.Close()
+			}
+		}
+	}()
 
 	ch <- "You are " + who
 	messages <- who + " has arrived"
@@ -86,9 +103,10 @@ func handleConn(conn net.Conn) {
 	input := bufio.NewScanner(conn)
 	for input.Scan() {
 		messages <- who + ": " + input.Text()
+		reset <- struct{}{}
 	}
 	leaving <- client
-	messages <- who + "has left"
+	messages <- who + " has left"
 	conn.Close()
 
 }
@@ -96,24 +114,5 @@ func handleConn(conn net.Conn) {
 func clientWriter(conn net.Conn, ch chan string) {
 	for msg := range ch {
 		fmt.Fprintln(conn, msg)
-	}
-}
-
-func clientTimer(conn net.Conn, ch chan string) {
-	timer := time.NewTimer(2 * time.Second)
-	who := conn.RemoteAddr().String()
-	for {
-		select {
-		case <-timer.C:
-			leaving <- &clientWithName{ch, who}
-			messages <- who + "has timed out"
-			conn.Close()
-			return
-		case <-ch:
-			timer.Stop()
-			timer = time.NewTimer(2 * time.Second)
-		default:
-			// do nothing
-		}
 	}
 }
