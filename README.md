@@ -159,14 +159,14 @@ func query() {
 }
 ```
 
-- Note that the usage of on unbuffered channel will cause the two slower goroutines to have no one to receive their message; this is known as a _goroutine leak_
+- Note that the usage of on unbuffered channel will cause the two slower goroutines to have no one to receive their message and therefore getting stuck forever; this is known as a _goroutine leak_
 - The full example can be found [here](ch8/bufChannel/main.go)
 - Note that the choice of buffered vs unbuffered, as well as the capacity of the buffered channel affects both performance and correctness of the program; watch for goroutine leaks that may add up over time to cause hangs and slowdowns
-- Goroutine leaks are not automatically collected
+- Goroutine leaks are not automatically collected by the garbage collector
 
-##### Parallel Workers
+##### Looping in parallel
 
-- A very common pattern is to run workers in parallel
+- A very common concurrency pattern is to run iterations of a loop in parallel
 - Examples of this can be seen in the [thumbnail generator example](ch8/thumbnail/main.go)
 - Note particularly the `makeThumbnails6` function, for which we perform the following steps:
   1. Make channels for input and output
