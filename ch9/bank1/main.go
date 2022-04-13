@@ -29,9 +29,9 @@ func teller() {
 		case amount := <-deposits:
 			balance += amount
 		case withdrawal := <-withdrawals:
-			temp_balance := balance - withdrawal.amount
-			if temp_balance > 0 {
-				balance = temp_balance
+			tempBalance := balance - withdrawal.amount
+			if tempBalance > 0 {
+				balance = tempBalance
 				withdrawal.isSuccess <- true
 			} else {
 				withdrawal.isSuccess <- false
