@@ -42,12 +42,11 @@ func teller() {
 	}
 }
 
-func initialize() {
+func init() {
 	go teller()
 }
 
 func main() {
-	initialize()
 	Deposit(200)
 	fmt.Println(Balance())
 	Deposit(2000)
