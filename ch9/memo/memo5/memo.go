@@ -1,5 +1,7 @@
 package memo5
 
+import "fmt"
+
 type entry struct {
 	res   result
 	ready chan struct{} // closed when res is ready
@@ -27,21 +29,34 @@ func New(f Func) *Memo {
 }
 
 func (memo *Memo) server(f Func) {
-	cache := make(map[string]result)
+	cache := make(map[string]*entry)
 	for req := range memo.requests {
-		res, ok := cache[req.key]
-		if ok {
-			req.response <- res
-		} else {
-			res := result{}
-			res.value, res.err = f(req.key)
-			cache[req.key] = res
-			req.response <- res
+		e := cache[req.key]
+		// cache miss
+		if e == nil {
+			fmt.Println("cache miss for: " + req.key)
+			e = &entry{ready: make(chan struct{})}
+			cache[req.key] = e
+			go e.call(f, req.key)
 		}
+		go e.deliver(req.response)
 	}
 }
 
-// Non blocking cache with channels
+func (e *entry) deliver(response chan<- result) {
+	// wait for cache value to be ready
+	<-e.ready
+	// return data back to the channel
+	response <- e.res
+}
+
+func (e *entry) call(f Func, key string) {
+	e.res.value, e.res.err = f(key)
+	// broadcase that cache value is ready
+	close(e.ready)
+}
+
+// Non blocking cache with channels only
 func (memo *Memo) Get(key string) (interface{}, error) {
 	response := make(chan result)
 	memo.requests <- request{key, response}
