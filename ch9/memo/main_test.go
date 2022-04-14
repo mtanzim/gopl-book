@@ -30,7 +30,7 @@ func httpGetBody(url string, done chan struct{}) (interface{}, error) {
 	}
 
 	if cancelled() {
-		return nil, errors.New("Execution cancelled")
+		return nil, errors.New("execution cancelled, not running function for: " + url)
 	}
 
 	resp, err := http.Get(url)
@@ -89,6 +89,9 @@ func TestMainConcurrent(t *testing.T) {
 
 func TestMainConcurrentWithCancel(t *testing.T) {
 	done := make(chan struct{})
+	time.AfterFunc(time.Duration(1)*time.Millisecond, func() {
+		close(done)
+	})
 	m := memo.New(httpGetBody, done)
 	var n sync.WaitGroup
 	for _, url := range incomingUrls() {

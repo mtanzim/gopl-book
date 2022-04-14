@@ -1,6 +1,9 @@
 package memo6
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 type entry struct {
 	res   result
@@ -38,14 +41,15 @@ func (memo *Memo) server(f Func, done chan struct{}) {
 			e := cache[req.key]
 			// cache miss
 			if e == nil {
-				fmt.Println("cache miss for: " + req.key)
 				e = &entry{ready: make(chan struct{})}
 				cache[req.key] = e
 				go e.call(f, req.key, done)
 			}
 			go e.deliver(req.response)
 		case <-done:
-			close(memo.requests)
+			fmt.Println("cancelled, stopping server")
+			// drain channel if needed
+			<-memo.requests
 			return
 		}
 	}
@@ -67,7 +71,12 @@ func (e *entry) call(f Func, key string, done chan struct{}) {
 // Non blocking cache with channels only
 func (memo *Memo) Get(key string, done chan struct{}) (interface{}, error) {
 	response := make(chan result)
-	memo.requests <- request{key, response, done}
-	res := <-response
-	return res.value, res.err
+	select {
+	case <-done:
+		return nil, errors.New("timer fired, not adding requests for: " + key)
+	case memo.requests <- request{key, response, done}:
+		res := <-response
+		return res.value, res.err
+	}
+
 }
