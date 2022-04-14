@@ -12,7 +12,8 @@ import (
 	// memo "github.com/mtanzim/gopl-book/ch9/memo/memo1"
 	// memo "github.com/mtanzim/gopl-book/ch9/memo/memo2"
 	// memo "github.com/mtanzim/gopl-book/ch9/memo/memo3"
-	memo "github.com/mtanzim/gopl-book/ch9/memo/memo4"
+	// memo "github.com/mtanzim/gopl-book/ch9/memo/memo4"
+	memo "github.com/mtanzim/gopl-book/ch9/memo/memo5"
 )
 
 func httpGetBody(url string) (interface{}, error) {
