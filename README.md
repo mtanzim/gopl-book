@@ -214,3 +214,11 @@ select {
 - See [broadcast](ch8/broadcast/main.go) for an example
 
 ##### [Chat Example](ch8/chat/main.go)
+
+### Concurrency with shared variables
+
+- TODO
+
+### Testing
+
+- TODO
