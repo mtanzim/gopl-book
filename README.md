@@ -271,4 +271,4 @@ go test -v -run="French|Canal"
 
 - As one may note, writing tests like this becomes tedious, and thus, table driven tests are very popular in go
   - See [example](./ch11/word2/word_test.go)
-- One may use `t.Fatalf` if a test function must be stopped in its tracks. This is generally not recommended
+- One may use `t.Fatalf` if a test function must be stopped in its tracks; this is generally not recommended
