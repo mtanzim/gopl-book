@@ -249,8 +249,8 @@ func TestName(t *testing.T){
 - The optional suffix `Name` must also begin with a capital letter, ie:
 
 ```go
-func TestSin(t *testing.T){ // }
-func TestCos(t *testing.T){ // }
+func TestSin(t *testing.T){ }
+func TestCos(t *testing.T){ }
 ```
 
 - See the [palindrome](ch11/word1/word_test.go) tests for a very basic example
