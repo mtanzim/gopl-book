@@ -221,4 +221,54 @@ select {
 
 ### Testing
 
-- TODO
+- Similar to other aspects in the language, Go has a very minimal approach to testing frameworks:
+  - Writing test code is very similar to writing the program itself
+  - Write short functions focusing on a single task
+  - Be careful about boundary conditions
+  - Be careful about selecting and using data structures
+  - Think about what inputs result in what outputs
+- Due to the similarity, the belief is that the same conventions, notations and tools can be applied to testing as well as writing Go code
+- `go test` is a the test driver for Go packages
+- Files suffixed with `_test.go` are not part of the `go build` process, but rather the `go test` process
+- Test files can contain:
+  1. Test functions that result in either PASS or FAIL
+  1. Benchmark functions
+  1. Example functions
+- Let's focus on test functions first
+
+### Test Functions
+
+- Test files have to import the `testing` package, and must follow the follow signature:
+
+```go
+func TestName(t *testing.T){
+  //
+}
+```
+
+- The optional suffix `Name` must also begin with a capital letter, ie:
+
+```go
+func TestSin(t *testing.T){ // }
+func TestCos(t *testing.T){ // }
+```
+
+- See the [palindrome](ch11/word1/word_test.go) tests for a very basic example
+- To run the above tests, we can simple navigate to the package and run `go test`
+
+```bash
+cd ./ch11/word1/
+go test
+```
+
+- On the latter 2 tests, note the usage of `t.Errorf` to avoid repetition
+- Also note that 2 of the tests fail. If we want to only run the failing tests, we may use the `-run` flag, which takes a regular expression, ie:
+
+```bash
+cd ./ch11/word1/
+go test -v -run="French|Canal"
+```
+
+- As one may note, writing tests like this becomes tedious, and thus, table driven tests are very popular in go
+  - See [example](./ch11/word2/word_test.go)
+- One may use `t.Fatalf` if a test function must be stopped in its tracks. This is generally not recommended
