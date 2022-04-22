@@ -236,7 +236,7 @@ select {
   1. Example functions
 - Let's focus on test functions first
 
-### Test Functions
+#### Test Functions
 
 - Test files have to import the `testing` package, and must follow the follow signature:
 
@@ -272,3 +272,8 @@ go test -v -run="French|Canal"
 - As one may note, writing tests like this becomes tedious, and thus, table driven tests are very popular in go
   - See [example](./ch11/word2/word_test.go)
 - One may use `t.Fatalf` if a test function must be stopped in its tracks; this is generally not recommended
+
+#### Testing a command
+
+- The `go test` tool also allows testing commands alongside packages with little effort
+- Although the `main` package normally generates an executable, it can also be imported as a library
