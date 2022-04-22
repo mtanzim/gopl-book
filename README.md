@@ -277,3 +277,6 @@ go test -v -run="French|Canal"
 
 - The `go test` tool also allows testing commands alongside packages with little effort
 - Although the `main` package normally generates an executable, it can also be imported as a library
+- See [here](./ch11/simpleMath/main_test.go) for an example, noting how we mocked out the global variable `out` to capture the output in the tests
+- Despite the package being `main`, during tests, the package acts as a library exposing the `Test` function to the test driver
+- Take care not to call `log.Fatal` or `os.Exit` in the functions we are testing; these are to be reserved for the `main` function
