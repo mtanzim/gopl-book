@@ -280,3 +280,28 @@ go test -v -run="French|Canal"
 - See [here](./ch11/simpleMath/main_test.go) for an example, noting how we mocked out the global variable `out` to capture the output in the tests
 - Despite the package being `main`, during tests, the package acts as a library exposing the `Test` function to the test driver
 - Take care not to call `log.Fatal` or `os.Exit` in the functions we are testing; these are to be reserved for the `main` function
+
+### White box testing
+
+- Black box and white box testing are both popular methods in software development
+- Black box testing assumes nothing about the internal implementation; rather it tests against the specified documentation, interfaces and API
+- Black box testing is great for empathizing with the users of the code to discover API flaws. It is also more robust as it requires less maintenance as the software evolves
+- White box tests on the other hand have access to internal structures of the code which may otherwise be unavailable to clients
+- White box testing can be very useful for testing the trickier parts of the code, and ensure internal invariants hold
+- Looking back tests for [IsPalindrome](./ch11/word2/word_test.go) is an example of black box testing
+- Tests for [simpleMath](./ch11/simpleMath/main_test.go) is an example of white box testing
+- With `simpleMath`, particularly note how the global variable `out` is replaced, or "faked" during testing
+- Fakes such as the above provide many advantages, as they are easy to predict, observe and configure
+- Fakes also help avoid side effects such as updating production databases, interacting with external clients etc.
+- Let's take an [example](./ch11/storage1/main.go); we can see how this can be difficult to test without setting up the correct infrastructure to send emails
+- Now, let's take a look at the [subsequent example](./ch11/storage2/main.go), noting how there is a global variable `notifyUser` that can be faked during tests
+- Looking at the [test](./ch11/storage2/main_test.go), we note the following
+  - We are mocking out global `notifyUser` variable, and then using the fake for assertions
+  - However, we are careful to restore the global variable with the following code snippet
+
+```go
+	saved := notifyUser
+	defer func() { notifyUser = saved }()
+```
+- This pattern can be used to save and restore many types of global variables, including flags, debugging options, performance parameters etc.
+- Keep in mind however that this patter works since `go test` does not normally run tests concurrently
