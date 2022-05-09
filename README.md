@@ -303,9 +303,9 @@ go test -v -run="French|Canal"
 	saved := notifyUser
 	defer func() { notifyUser = saved }()
 ```
+
 - This pattern can be used to save and restore many types of global variables, including flags, debugging options, performance parameters etc.
 - Keep in mind however that this patter works since `go test` does not normally run tests concurrently
-
 
 ### External test packages
 
@@ -322,8 +322,21 @@ go test -v -run="French|Canal"
 package B
 var privateFn = PrivateFn
 ```
+
 - Note how the above file would not contain an tests, rather, simply expose a private variable to the external test package
 - The following commands may be used to see a list of files matching the varying categories we discussed
   - `go list -f={{.GoFiles}} fmt`: all files that `go build` would include in the `fmt` package
   - `go list -f={{.TestGoFiles}} fmt`: all files ending in `_test.go` that are only built during tests
   - `go list -f={{.XTestGoFiles}} fmt`: are also test only files, but note that these must import the `fmt` package
+
+### Benchmarking
+
+- TODO
+
+### Profiling
+
+- TODO
+
+### Example functions
+
+- TODO
